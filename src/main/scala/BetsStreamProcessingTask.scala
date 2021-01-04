@@ -36,10 +36,10 @@ object BetsStreamProcessingTask extends App {
     .filter($"country" === "US" && !$"game_name".endsWith("_demo"))
     .withColumn("bet", when($"currency_code" === "EUR", $"bet" / 1.1).otherwise($"bet"))
     .withColumn("win", when($"currency_code" === "EUR", $"win" / 1.1).otherwise($"win"))
-    .withWatermark("event_time", "20 seconds")
+    .withWatermark("event_time", "20 minutes")
 
   val windowedStatsPerGame = filteredBetsUSD
-    .groupBy(window($"event_time", "10 seconds"), $"game_name")
+    .groupBy(window($"event_time", "10 minutes"), $"game_name")
     .agg(
       max("bet") as "max_bet",
       min("bet") as "min_bet",
@@ -56,7 +56,7 @@ object BetsStreamProcessingTask extends App {
 
 
   val windowedProfit = filteredBetsUSD
-    .groupBy(window($"event_time", "10 seconds"))
+    .groupBy(window($"event_time", "10 minutes"))
     .agg(sum($"bet" - $"win") as "profit")
     .withColumn("window_end", $"window.end")
     .drop("window")

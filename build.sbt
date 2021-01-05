@@ -1,4 +1,4 @@
-name := "active-transport-stream-enrichment"
+name := "888-solution"
 
 version := "0.1"
 
